@@ -79,8 +79,10 @@ export default function Landing() {
             <a href="#how-it-works" className="text-white/80 hover:text-white transition-colors">How It Works</a>
             <a href="#plans" className="text-white/80 hover:text-white transition-colors">Plans</a>
             <Link to="/login" className="text-white/80 hover:text-white transition-colors">Client Login</Link>
-            <Link to="/login" className="text-white/80 hover:text-white transition-colors">Attorney Portal</Link>
-            <Link to="/login" className="text-white/80 hover:text-white transition-colors">Firm Dashboard</Link>
+            <Link to="/attorney/join" className="text-white/80 hover:text-white transition-colors">Attorney Network</Link>
+            <Link to="/owner/join" className="text-white/80 hover:text-white transition-colors">Firm Admin</Link>
+            <Link to="/firm/create" className="text-white/80 hover:text-white transition-colors">Create Firm</Link>
+            <Link to="/admin/setup" className="text-white/80 hover:text-white transition-colors">Platform Admin</Link>
           </nav>
           <Link to="/book">
             <Button className="bg-[#c9a84c] hover:bg-[#b8973b] text-[#1a2744] font-semibold text-sm px-5">
@@ -235,10 +237,11 @@ export default function Landing() {
             <span>· Tom Phinney, Esq.</span>
           </div>
           <p className="text-center">Attorney-client privileged platform. Not legal advice until engagement letter is signed.</p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <Link to="/login" className="text-[#c9a84c] hover:text-[#d4b565]">Client Login</Link>
-            <Link to="/login" className="text-[#c9a84c] hover:text-[#d4b565]">Attorney Portal</Link>
-            <Link to="/login" className="text-[#c9a84c] hover:text-[#d4b565]">Firm Dashboard</Link>
+            <Link to="/attorney/join" className="text-[#c9a84c] hover:text-[#d4b565]">Join Network</Link>
+            <Link to="/owner/join" className="text-[#c9a84c] hover:text-[#d4b565]">Firm Admin</Link>
+            <Link to="/firm/create" className="text-[#c9a84c] hover:text-[#d4b565]">Create Firm</Link>
           </div>
         </div>
       </footer>

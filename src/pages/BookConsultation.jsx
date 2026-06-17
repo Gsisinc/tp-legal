@@ -12,6 +12,8 @@ import {
   sendBookingCredentialsEmail,
   isExistingUserError,
 } from "@/lib/auth-utils";
+import { APP_ROLES } from "@/lib/constants";
+import { createUserProfile, getOrCreateOwnerFirm, getUserProfile } from "@/lib/user-profile";
 
 const PRACTICE_AREAS = [
   { name: "Constitutional Law", subtitle: "Federal / Civil Rights" },
@@ -96,8 +98,10 @@ export default function BookConsultation() {
 
   const createBookingRecords = async (clientId) => {
     const scheduledDate = getScheduledDate();
+    const ownerFirm = await getOrCreateOwnerFirm(clientId);
 
     const matter = await base44.entities.Matter.create({
+      firm_id: ownerFirm.id,
       client_id: clientId,
       client_name: form.client_name,
       client_email: form.client_email,
@@ -171,6 +175,21 @@ export default function BookConsultation() {
       }
 
       const user = await base44.auth.me();
+
+      let profile = await getUserProfile(user.id);
+      if (!profile) {
+        const ownerFirm = await getOrCreateOwnerFirm(user.id);
+        profile = await createUserProfile({
+          user_id: user.id,
+          email: form.client_email.trim().toLowerCase(),
+          full_name: form.client_name,
+          firm_id: ownerFirm.id,
+          app_role: APP_ROLES.CLIENT,
+          subscription_status: "none",
+          onboarding_complete: true,
+        });
+      }
+
       await createBookingRecords(user.id);
 
       try {

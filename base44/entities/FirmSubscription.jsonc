@@ -1,0 +1,48 @@
+{
+  "name": "FirmSubscription",
+  "type": "object",
+  "properties": {
+    "firm_id": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "essential",
+        "professional",
+        "premier"
+      ]
+    },
+    "price": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "active",
+        "past_due",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "billing_cycle_start": {
+      "type": "string",
+      "format": "date"
+    },
+    "billing_cycle_end": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "user_id",
+    "plan"
+  ]
+}

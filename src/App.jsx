@@ -6,7 +6,9 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import RoleGuard from '@/components/RoleGuard';
 import ScrollToTop from './components/ScrollToTop';
+import { APP_ROLES } from '@/lib/constants';
 
 // Public pages
 import Landing from './pages/Landing';
@@ -31,11 +33,17 @@ import ClientDashboard from './pages/ClientDashboard';
 // Network Attorney pages
 import NetworkAttorneyDashboard from './pages/NetworkAttorneyDashboard';
 
-// Auth pages
+// Auth & onboarding pages
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import AdminSetup from './pages/AdminSetup';
+import FirmAdminJoin from './pages/FirmAdminJoin';
+import AttorneyJoin from './pages/AttorneyJoin';
+import FirmCreate from './pages/FirmCreate';
+import AttorneySubscribe from './pages/AttorneySubscribe';
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -66,25 +74,44 @@ const AuthenticatedApp = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/admin/setup" element={<AdminSetup />} />
+      <Route path="/owner/join" element={<FirmAdminJoin />} />
+      <Route path="/attorney/join" element={<AttorneyJoin />} />
+      <Route path="/firm/create" element={<FirmCreate />} />
 
-      {/* Protected app routes */}
+      {/* Protected routes */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-        <Route element={<AppLayout />}>
-          {/* Owner */}
-          <Route path="/owner" element={<OwnerDashboard />} />
-          <Route path="/owner/matters" element={<OwnerMatters />} />
-          <Route path="/owner/playbooks" element={<OwnerPlaybooks />} />
-          <Route path="/owner/analytics" element={<OwnerAnalytics />} />
-          <Route path="/owner/network" element={<OwnerNetwork />} />
-          <Route path="/owner/settings" element={<OwnerSettings />} />
+        <Route path="/attorney/subscribe" element={<AttorneySubscribe />} />
 
-          {/* Client */}
-          <Route path="/client" element={<ClientDashboard />} />
-          <Route path="/client/documents" element={<ClientDocuments />} />
-          <Route path="/client/messages" element={<ClientMessages />} />
+        <Route element={<RoleGuard allowedRoles={[APP_ROLES.SUPER_ADMIN]} redirectTo="/login" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/super-admin" element={<SuperAdminDashboard />} />
+          </Route>
+        </Route>
 
-          {/* Network Attorney */}
-          <Route path="/attorney" element={<NetworkAttorneyDashboard />} />
+        <Route element={<RoleGuard allowedRoles={[APP_ROLES.SUPER_ADMIN, APP_ROLES.FIRM_ADMIN, APP_ROLES.FIRM_OWNER]} redirectTo="/login" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/owner" element={<OwnerDashboard />} />
+            <Route path="/owner/matters" element={<OwnerMatters />} />
+            <Route path="/owner/playbooks" element={<OwnerPlaybooks />} />
+            <Route path="/owner/analytics" element={<OwnerAnalytics />} />
+            <Route path="/owner/network" element={<OwnerNetwork />} />
+            <Route path="/owner/settings" element={<OwnerSettings />} />
+          </Route>
+        </Route>
+
+        <Route element={<RoleGuard allowedRoles={[APP_ROLES.CLIENT]} redirectTo="/login" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/client" element={<ClientDashboard />} />
+            <Route path="/client/documents" element={<ClientDocuments />} />
+            <Route path="/client/messages" element={<ClientMessages />} />
+          </Route>
+        </Route>
+
+        <Route element={<RoleGuard allowedRoles={[APP_ROLES.NETWORK_ATTORNEY]} redirectTo="/login" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/attorney" element={<NetworkAttorneyDashboard />} />
+          </Route>
         </Route>
       </Route>
 

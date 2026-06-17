@@ -3,9 +3,18 @@ import { Link, useLocation, Outlet } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import {
   LayoutDashboard, Users, FileText, MessageSquare, Settings,
-  DollarSign, BookOpen, LogOut, Menu, X, BarChart2, Building2, Scale
+  DollarSign, BookOpen, LogOut, Menu, X, BarChart2, Shield, Scale
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { APP_ROLES } from "@/lib/constants";
+import { resolveUserWithProfile } from "@/lib/user-profile";
+
+const SUPER_ADMIN_NAV = [
+  { label: "Platform Admin", icon: Shield, to: "/super-admin" },
+  { label: "Firm Dashboard", icon: LayoutDashboard, to: "/owner" },
+  { label: "Network", icon: Users, to: "/owner/network" },
+  { label: "Analytics", icon: BarChart2, to: "/owner/analytics" },
+  { label: "Settings", icon: Settings, to: "/owner/settings" },
+];
 
 const OWNER_NAV = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/owner" },
@@ -36,15 +45,31 @@ const ATTORNEY_NAV = [
 
 export default function AppLayout() {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
+    base44.auth.me().then(async (u) => {
+      setUser(u);
+      const { profile: p } = await resolveUserWithProfile(u);
+      setProfile(p);
+    }).catch(() => {});
   }, []);
 
-  const role = user?.role;
-  const navItems = role === "admin" ? OWNER_NAV : role === "network_attorney" ? ATTORNEY_NAV : CLIENT_NAV;
+  const appRole = profile?.app_role || (user?.role === "admin" ? APP_ROLES.FIRM_ADMIN : APP_ROLES.CLIENT);
+  const navItems =
+    appRole === APP_ROLES.SUPER_ADMIN ? SUPER_ADMIN_NAV :
+    [APP_ROLES.FIRM_ADMIN, APP_ROLES.FIRM_OWNER].includes(appRole) ? OWNER_NAV :
+    appRole === APP_ROLES.NETWORK_ATTORNEY ? ATTORNEY_NAV : CLIENT_NAV;
+
+  const roleLabel = {
+    [APP_ROLES.SUPER_ADMIN]: "Super Admin",
+    [APP_ROLES.FIRM_ADMIN]: "Firm Admin",
+    [APP_ROLES.FIRM_OWNER]: "Firm Owner",
+    [APP_ROLES.NETWORK_ATTORNEY]: "Network Attorney",
+    [APP_ROLES.CLIENT]: "Client",
+  }[appRole] || "User";
 
   const isActive = (to) => location.pathname === to || location.pathname.startsWith(to + "/");
 
@@ -77,7 +102,7 @@ export default function AppLayout() {
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-semibold truncate">{user.full_name}</p>
-                <p className="text-[10px] text-white/40 capitalize">{role === "admin" ? "Owner" : role === "network_attorney" ? "Network Attorney" : "Client"}</p>
+                <p className="text-[10px] text-white/40">{roleLabel}</p>
               </div>
             </div>
           </div>

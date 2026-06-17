@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { getDashboardPathForUser } from "@/lib/auth-utils";
+import { APP_ROLES } from "@/lib/constants";
+import { createUserProfile, getOrCreateOwnerFirm, getUserProfile } from "@/lib/user-profile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,7 +49,19 @@ export default function Register() {
         base44.auth.setToken(result.access_token);
       }
       const user = await base44.auth.me();
-      window.location.href = getDashboardPathForUser(user);
+      let profile = await getUserProfile(user.id);
+      if (!profile) {
+        const firm = await getOrCreateOwnerFirm(user.id);
+        profile = await createUserProfile({
+          user_id: user.id,
+          email,
+          full_name: user.full_name || email,
+          firm_id: firm.id,
+          app_role: APP_ROLES.CLIENT,
+          onboarding_complete: true,
+        });
+      }
+      window.location.href = await getDashboardPathForUser(user);
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {

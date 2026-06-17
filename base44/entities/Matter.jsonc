@@ -2,6 +2,10 @@
   "name": "Matter",
   "type": "object",
   "properties": {
+    "firm_id": {
+      "type": "string",
+      "description": "Tenant firm that owns this matter"
+    },
     "client_id": {
       "type": "string",
       "description": "ID of the client user"

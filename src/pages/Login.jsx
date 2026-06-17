@@ -45,6 +45,12 @@ export default function Login() {
           <Link to="/register" className="text-primary font-medium hover:underline">
             Create one
           </Link>
+          <span className="block mt-2 text-xs text-muted-foreground">
+            Platform admin?{" "}
+            <Link to="/admin/setup" className="text-primary hover:underline">Set up super admin</Link>
+            {" · "}
+            <Link to="/owner/join" className="text-primary hover:underline">Firm admin signup</Link>
+          </span>
         </>
       }
     >

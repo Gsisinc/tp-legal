@@ -1,0 +1,44 @@
+{
+  "name": "Firm",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "owner_user_id": {
+      "type": "string"
+    },
+    "tenant_type": {
+      "type": "string",
+      "enum": [
+        "platform",
+        "owner",
+        "standalone"
+      ],
+      "default": "standalone"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "primary_color": {
+      "type": "string",
+      "default": "#1a2744"
+    },
+    "accent_color": {
+      "type": "string",
+      "default": "#c9a84c"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name",
+    "owner_user_id",
+    "tenant_type"
+  ]
+}

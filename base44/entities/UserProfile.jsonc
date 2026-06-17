@@ -1,0 +1,88 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "full_name": {
+      "type": "string"
+    },
+    "firm_id": {
+      "type": "string"
+    },
+    "app_role": {
+      "type": "string",
+      "enum": [
+        "super_admin",
+        "firm_admin",
+        "network_attorney",
+        "firm_owner",
+        "client"
+      ],
+      "default": "client"
+    },
+    "bar_number": {
+      "type": "string"
+    },
+    "bar_state": {
+      "type": "string"
+    },
+    "platform_fee_rate": {
+      "type": "number",
+      "default": 0.1
+    },
+    "terms_accepted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "terms_version": {
+      "type": "string"
+    },
+    "agreement_type": {
+      "type": "string",
+      "enum": [
+        "network_referral",
+        "firm_tenant",
+        "platform"
+      ]
+    },
+    "subscription_plan": {
+      "type": "string",
+      "enum": [
+        "essential",
+        "professional",
+        "premier"
+      ]
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "none",
+        "pending",
+        "active",
+        "past_due",
+        "cancelled"
+      ],
+      "default": "none"
+    },
+    "stripe_customer_id": {
+      "type": "string"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "onboarding_complete": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "user_id",
+    "email",
+    "app_role"
+  ]
+}
