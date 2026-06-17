@@ -68,3 +68,9 @@
     @apply font-heading;
   }
 }
+
+@layer utilities {
+  .h-13 {
+    height: 3.25rem;
+  }
+}
