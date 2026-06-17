@@ -1,0 +1,42 @@
+{
+  "name": "DocumentTemplate",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "engagement_letter",
+        "demand_letter",
+        "nda",
+        "settlement",
+        "court_form",
+        "other"
+      ]
+    },
+    "practice_area": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string",
+      "description": "Template body with {{merge_field}} placeholders"
+    },
+    "merge_fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of merge field names used in the template"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name",
+    "category"
+  ]
+}

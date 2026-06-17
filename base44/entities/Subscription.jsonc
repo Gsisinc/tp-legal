@@ -1,0 +1,64 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string"
+    },
+    "client_name": {
+      "type": "string"
+    },
+    "client_email": {
+      "type": "string"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "essential",
+        "professional",
+        "premier"
+      ]
+    },
+    "price": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "cancelled",
+        "past_due"
+      ],
+      "default": "active"
+    },
+    "billing_cycle_start": {
+      "type": "string",
+      "format": "date"
+    },
+    "billing_cycle_end": {
+      "type": "string",
+      "format": "date"
+    },
+    "consultations_used": {
+      "type": "number",
+      "default": 0
+    },
+    "consultations_total": {
+      "type": "number"
+    },
+    "documents_used": {
+      "type": "number",
+      "default": 0
+    },
+    "documents_total": {
+      "type": "number"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_id",
+    "plan"
+  ]
+}

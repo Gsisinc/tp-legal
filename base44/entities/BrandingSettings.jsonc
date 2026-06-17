@@ -1,0 +1,48 @@
+{
+  "name": "BrandingSettings",
+  "type": "object",
+  "properties": {
+    "firm_name": {
+      "type": "string",
+      "default": "TP Legal"
+    },
+    "attorney_name": {
+      "type": "string",
+      "default": "Tom Phinney, Esq."
+    },
+    "tagline": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "primary_color": {
+      "type": "string",
+      "default": "#1a2744"
+    },
+    "accent_color": {
+      "type": "string",
+      "default": "#c9a84c"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "custom_domain": {
+      "type": "string"
+    },
+    "consultation_fee_min": {
+      "type": "number",
+      "default": 150
+    },
+    "consultation_fee_max": {
+      "type": "number",
+      "default": 350
+    }
+  }
+}

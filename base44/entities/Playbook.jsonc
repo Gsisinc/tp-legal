@@ -1,0 +1,43 @@
+{
+  "name": "Playbook",
+  "type": "object",
+  "properties": {
+    "practice_area": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "intake_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_documents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ai_tasks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "common_matters": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "practice_area"
+  ]
+}

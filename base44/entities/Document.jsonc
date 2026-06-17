@@ -1,0 +1,57 @@
+{
+  "name": "Document",
+  "type": "object",
+  "properties": {
+    "matter_id": {
+      "type": "string"
+    },
+    "client_id": {
+      "type": "string"
+    },
+    "attorney_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "client_upload",
+        "attorney_draft",
+        "template",
+        "engagement_letter",
+        "signed"
+      ]
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "uploaded",
+        "draft",
+        "pending_review",
+        "approved",
+        "signed"
+      ],
+      "default": "uploaded"
+    },
+    "requires_signature": {
+      "type": "boolean",
+      "default": false
+    },
+    "signed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ]
+}

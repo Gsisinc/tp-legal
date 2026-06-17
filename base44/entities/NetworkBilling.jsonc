@@ -1,0 +1,53 @@
+{
+  "name": "NetworkBilling",
+  "type": "object",
+  "properties": {
+    "matter_id": {
+      "type": "string"
+    },
+    "network_attorney_id": {
+      "type": "string"
+    },
+    "network_attorney_name": {
+      "type": "string"
+    },
+    "client_id": {
+      "type": "string"
+    },
+    "client_name": {
+      "type": "string"
+    },
+    "billed_amount": {
+      "type": "number"
+    },
+    "platform_fee": {
+      "type": "number",
+      "description": "10% of billed_amount"
+    },
+    "attorney_net": {
+      "type": "number",
+      "description": "90% of billed_amount"
+    },
+    "description": {
+      "type": "string"
+    },
+    "billing_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "logged",
+        "paid",
+        "disputed"
+      ],
+      "default": "logged"
+    }
+  },
+  "required": [
+    "matter_id",
+    "network_attorney_id",
+    "billed_amount"
+  ]
+}

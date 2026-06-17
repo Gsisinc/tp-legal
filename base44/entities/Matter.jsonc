@@ -1,0 +1,150 @@
+{
+  "name": "Matter",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "ID of the client user"
+    },
+    "client_name": {
+      "type": "string"
+    },
+    "client_email": {
+      "type": "string"
+    },
+    "attorney_id": {
+      "type": "string",
+      "description": "Assigned attorney user ID (owner or network attorney)"
+    },
+    "attorney_name": {
+      "type": "string"
+    },
+    "practice_area": {
+      "type": "string",
+      "enum": [
+        "Constitutional Law",
+        "Immigration Law",
+        "Criminal Law",
+        "Civil Litigation",
+        "Family Law",
+        "Employment Law",
+        "Real Estate Law",
+        "Estate Planning & Probate",
+        "Business & Corporate Law",
+        "Intellectual Property",
+        "Bankruptcy Law",
+        "Traffic & Motor Vehicle Law",
+        "Personal Injury",
+        "Tax Law",
+        "Health Care Law",
+        "Environmental Law",
+        "Education Law",
+        "Social Security & Disability Law"
+      ]
+    },
+    "matter_type": {
+      "type": "string",
+      "description": "Sub-category within practice area"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Consultation Booked",
+        "Intake Complete",
+        "Quote Sent",
+        "Engaged",
+        "Active",
+        "Closed"
+      ],
+      "default": "Consultation Booked"
+    },
+    "consultation_type": {
+      "type": "string",
+      "enum": [
+        "video",
+        "phone",
+        "async"
+      ],
+      "description": "Type of consultation requested"
+    },
+    "consultation_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "intake_responses": {
+      "type": "object",
+      "description": "Key-value answers to practice area intake questions"
+    },
+    "description": {
+      "type": "string"
+    },
+    "revenue_amount": {
+      "type": "number",
+      "description": "Total billed for this matter"
+    },
+    "revenue_type": {
+      "type": "string",
+      "enum": [
+        "consultation",
+        "subscription",
+        "case_fee",
+        "network_fee"
+      ]
+    },
+    "retainer_amount": {
+      "type": "number"
+    },
+    "retainer_paid": {
+      "type": "boolean",
+      "default": false
+    },
+    "quote_amount": {
+      "type": "number"
+    },
+    "quote_scope": {
+      "type": "string"
+    },
+    "quote_status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "sent",
+        "accepted",
+        "declined"
+      ],
+      "default": "draft"
+    },
+    "engagement_letter_signed": {
+      "type": "boolean",
+      "default": false
+    },
+    "engagement_letter_signed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "engagement_letter_signature": {
+      "type": "string",
+      "description": "Typed full name for e-signature"
+    },
+    "is_network_matter": {
+      "type": "boolean",
+      "default": false
+    },
+    "network_billed_amount": {
+      "type": "number",
+      "description": "Amount billed by network attorney"
+    },
+    "platform_fee_amount": {
+      "type": "number",
+      "description": "10% of network_billed_amount"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "practice_area",
+    "client_name",
+    "client_email"
+  ]
+}

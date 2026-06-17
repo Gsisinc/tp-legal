@@ -1,0 +1,78 @@
+{
+  "name": "Consultation",
+  "type": "object",
+  "properties": {
+    "matter_id": {
+      "type": "string"
+    },
+    "client_id": {
+      "type": "string"
+    },
+    "client_name": {
+      "type": "string"
+    },
+    "client_email": {
+      "type": "string"
+    },
+    "client_phone": {
+      "type": "string"
+    },
+    "practice_area": {
+      "type": "string"
+    },
+    "matter_type": {
+      "type": "string"
+    },
+    "consultation_type": {
+      "type": "string",
+      "enum": [
+        "video",
+        "phone",
+        "async"
+      ]
+    },
+    "scheduled_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "duration_minutes": {
+      "type": "number",
+      "default": 60
+    },
+    "fee": {
+      "type": "number",
+      "default": 250
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "waived"
+      ],
+      "default": "pending"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "booked",
+        "confirmed",
+        "completed",
+        "cancelled"
+      ],
+      "default": "booked"
+    },
+    "intake_responses": {
+      "type": "object"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_name",
+    "client_email",
+    "practice_area",
+    "consultation_type"
+  ]
+}

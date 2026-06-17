@@ -1,0 +1,51 @@
+{
+  "name": "MatterTask",
+  "type": "object",
+  "properties": {
+    "matter_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "is_completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "task_type": {
+      "type": "string",
+      "enum": [
+        "ai_generated",
+        "manual"
+      ],
+      "default": "ai_generated"
+    },
+    "assigned_to": {
+      "type": "string"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    }
+  },
+  "required": [
+    "matter_id",
+    "title"
+  ]
+}
