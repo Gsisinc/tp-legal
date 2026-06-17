@@ -79,6 +79,8 @@ export default function Landing() {
             <a href="#how-it-works" className="text-white/80 hover:text-white transition-colors">How It Works</a>
             <a href="#plans" className="text-white/80 hover:text-white transition-colors">Plans</a>
             <Link to="/login" className="text-white/80 hover:text-white transition-colors">Client Login</Link>
+            <Link to="/login" className="text-white/80 hover:text-white transition-colors">Attorney Portal</Link>
+            <Link to="/login" className="text-white/80 hover:text-white transition-colors">Firm Dashboard</Link>
           </nav>
           <Link to="/book">
             <Button className="bg-[#c9a84c] hover:bg-[#b8973b] text-[#1a2744] font-semibold text-sm px-5">
@@ -232,8 +234,12 @@ export default function Landing() {
             <span className="text-white font-semibold">TP Legal</span>
             <span>· Tom Phinney, Esq.</span>
           </div>
-          <p>Attorney-client privileged platform. Not legal advice until engagement letter is signed.</p>
-          <Link to="/login" className="text-[#c9a84c] hover:text-[#d4b565]">Client Login →</Link>
+          <p className="text-center">Attorney-client privileged platform. Not legal advice until engagement letter is signed.</p>
+          <div className="flex items-center gap-4">
+            <Link to="/login" className="text-[#c9a84c] hover:text-[#d4b565]">Client Login</Link>
+            <Link to="/login" className="text-[#c9a84c] hover:text-[#d4b565]">Attorney Portal</Link>
+            <Link to="/login" className="text-[#c9a84c] hover:text-[#d4b565]">Firm Dashboard</Link>
+          </div>
         </div>
       </footer>
     </div>

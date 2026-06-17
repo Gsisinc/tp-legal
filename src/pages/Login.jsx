@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { getDashboardPathForUser } from "@/lib/auth-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +21,8 @@ export default function Login() {
     setLoading(true);
     try {
       await base44.auth.loginViaEmailPassword(email, password);
-      window.location.href = "/";
+      const user = await base44.auth.me();
+      window.location.href = getDashboardPathForUser(user);
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {
@@ -36,7 +38,7 @@ export default function Login() {
     <AuthLayout
       icon={LogIn}
       title="Welcome back"
-      subtitle="Log in to your account"
+      subtitle="Sign in to your client portal, attorney dashboard, or firm admin area"
       footer={
         <>
           Don't have an account?{" "}

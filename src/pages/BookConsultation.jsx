@@ -1,11 +1,17 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ChevronRight, ChevronLeft, Video, Phone, FileText, Calendar, CheckCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ChevronRight, ChevronLeft, Video, Phone, FileText, Calendar, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { base44 } from "@/api/base44Client";
+import {
+  generateSecurePassword,
+  sendBookingCredentialsEmail,
+  isExistingUserError,
+} from "@/lib/auth-utils";
 
 const PRACTICE_AREAS = [
   { name: "Constitutional Law", subtitle: "Federal / Civil Rights" },
@@ -61,10 +67,14 @@ const DATES = Array.from({ length: 10 }, (_, i) => {
 }).filter(Boolean);
 
 export default function BookConsultation() {
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [booked, setBooked] = useState(false);
+  const [awaitingOtp, setAwaitingOtp] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [tempPassword, setTempPassword] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
   const [form, setForm] = useState({
     practice_area: "",
     consultation_type: "",
@@ -79,13 +89,29 @@ export default function BookConsultation() {
 
   const questions = PLAYBOOK_QUESTIONS[form.practice_area] || [];
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    const scheduledDate = form.selected_date && form.selected_time
+  const getScheduledDate = () =>
+    form.selected_date && form.selected_time
       ? new Date(`${form.selected_date} ${form.selected_time}`).toISOString()
       : new Date(Date.now() + 86400000).toISOString();
 
+  const createBookingRecords = async (clientId) => {
+    const scheduledDate = getScheduledDate();
+
+    const matter = await base44.entities.Matter.create({
+      client_id: clientId,
+      client_name: form.client_name,
+      client_email: form.client_email,
+      practice_area: form.practice_area,
+      consultation_type: form.consultation_type,
+      consultation_date: scheduledDate,
+      intake_responses: form.intake_responses,
+      status: "Consultation Booked",
+      description: form.description,
+    });
+
     await base44.entities.Consultation.create({
+      matter_id: matter.id,
+      client_id: clientId,
       client_name: form.client_name,
       client_email: form.client_email,
       client_phone: form.client_phone,
@@ -95,22 +121,89 @@ export default function BookConsultation() {
       intake_responses: form.intake_responses,
       fee: 250,
       status: "booked",
-      payment_status: "pending"
+      payment_status: "pending",
     });
+  };
 
-    await base44.entities.Matter.create({
-      client_name: form.client_name,
-      client_email: form.client_email,
-      practice_area: form.practice_area,
-      consultation_type: form.consultation_type,
-      consultation_date: scheduledDate,
-      intake_responses: form.intake_responses,
-      status: "Consultation Booked",
-      description: form.description
-    });
+  const handleSubmit = async () => {
+    setSubmitError("");
+    setLoading(true);
 
-    setLoading(false);
-    setBooked(true);
+    const password = generateSecurePassword();
+    setTempPassword(password);
+
+    try {
+      await base44.auth.register({
+        email: form.client_email.trim().toLowerCase(),
+        password,
+      });
+      setAwaitingOtp(true);
+    } catch (err) {
+      if (isExistingUserError(err)) {
+        setSubmitError(
+          "An account with this email already exists. Please log in with your existing credentials, or use Forgot Password on the login page."
+        );
+      } else {
+        setSubmitError(err.message || "Failed to create your account. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOtpVerify = async () => {
+    setSubmitError("");
+    setLoading(true);
+
+    try {
+      const result = await base44.auth.verifyOtp({
+        email: form.client_email.trim().toLowerCase(),
+        otpCode,
+      });
+
+      if (result?.access_token) {
+        base44.auth.setToken(result.access_token);
+      } else {
+        await base44.auth.loginViaEmailPassword(
+          form.client_email.trim().toLowerCase(),
+          tempPassword
+        );
+      }
+
+      const user = await base44.auth.me();
+      await createBookingRecords(user.id);
+
+      try {
+        await sendBookingCredentialsEmail({
+          email: form.client_email.trim().toLowerCase(),
+          name: form.client_name,
+          password: tempPassword,
+          practiceArea: form.practice_area,
+          date: form.selected_date,
+          time: form.selected_time,
+          consultationType: form.consultation_type,
+        });
+        setEmailSent(true);
+      } catch {
+        setEmailSent(false);
+      }
+
+      setAwaitingOtp(false);
+      setBooked(true);
+    } catch (err) {
+      setSubmitError(err.message || "Invalid verification code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setSubmitError("");
+    try {
+      await base44.auth.resendOtp(form.client_email.trim().toLowerCase());
+    } catch (err) {
+      setSubmitError(err.message || "Failed to resend code.");
+    }
   };
 
   if (booked) {
@@ -122,14 +215,73 @@ export default function BookConsultation() {
           </div>
           <h2 className="font-heading text-2xl font-bold text-[#1a2744] mb-3">Consultation Booked!</h2>
           <p className="text-gray-500 mb-2">Thank you, <strong>{form.client_name}</strong>.</p>
-          <p className="text-gray-500 text-sm mb-6">A confirmation has been sent to <strong>{form.client_email}</strong>. You'll receive your login credentials to access your client portal.</p>
+          {emailSent ? (
+            <p className="text-gray-500 text-sm mb-6">
+              A confirmation with your login credentials has been sent to <strong>{form.client_email}</strong>.
+            </p>
+          ) : (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-left mb-6 text-sm">
+              <p className="font-semibold text-amber-800 mb-2">Save your login credentials</p>
+              <p className="text-amber-900"><strong>Email:</strong> {form.client_email}</p>
+              <p className="text-amber-900"><strong>Password:</strong> {tempPassword}</p>
+              <p className="text-amber-700 mt-2 text-xs">We couldn't deliver the email — please save these credentials now.</p>
+            </div>
+          )}
           <div className="bg-[#1a2744]/5 rounded-lg p-4 text-left mb-6 text-sm">
             <p className="font-semibold text-[#1a2744] mb-1">{form.practice_area}</p>
             <p className="text-gray-500 capitalize">{form.consultation_type} consultation · {form.selected_date} at {form.selected_time}</p>
           </div>
-          <Link to="/login">
-            <Button className="w-full bg-[#1a2744] hover:bg-[#243560] text-white">Access Client Portal →</Button>
+          <Link to="/client">
+            <Button className="w-full bg-[#1a2744] hover:bg-[#243560] text-white">Go to Client Portal →</Button>
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (awaitingOtp) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-lg p-10 max-w-md w-full text-center">
+          <h2 className="font-heading text-2xl font-bold text-[#1a2744] mb-2">Verify Your Email</h2>
+          <p className="text-gray-500 text-sm mb-6">
+            We sent a 6-digit code to <strong>{form.client_email}</strong>. Enter it below to complete your booking.
+          </p>
+          {submitError && (
+            <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm text-left">{submitError}</div>
+          )}
+          <div className="flex justify-center mb-6">
+            <InputOTP maxLength={6} value={otpCode} onChange={setOtpCode} autoFocus>
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
+          <Button
+            onClick={handleOtpVerify}
+            disabled={loading || otpCode.length < 6}
+            className="w-full bg-[#1a2744] hover:bg-[#243560] text-white mb-3"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Confirming...
+              </>
+            ) : (
+              "Verify & Complete Booking"
+            )}
+          </Button>
+          <p className="text-sm text-gray-500">
+            Didn't receive the code?{" "}
+            <button onClick={handleResendOtp} className="text-[#1a2744] font-medium hover:underline">
+              Resend
+            </button>
+          </p>
         </div>
       </div>
     );
@@ -144,10 +296,13 @@ export default function BookConsultation() {
             <div className="w-6 h-6 bg-[#c9a84c] rounded-sm" />
             <span className="font-heading font-bold">TP Legal</span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <Link to="/login" className="text-sm text-white/70 hover:text-white">Log in</Link>
+            <div className="flex items-center gap-2">
             {[1,2,3,4].map(s => (
               <div key={s} className={`w-8 h-1.5 rounded-full transition-colors ${step >= s ? 'bg-[#c9a84c]' : 'bg-white/20'}`} />
             ))}
+            </div>
           </div>
         </div>
       </header>
@@ -305,10 +460,29 @@ export default function BookConsultation() {
               </div>
             </div>
 
+            {submitError && (
+              <div className="mt-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm">
+                {submitError}
+                {submitError.includes("already exists") && (
+                  <div className="mt-2 flex gap-3">
+                    <Link to="/login" className="text-[#1a2744] font-medium hover:underline">Log in</Link>
+                    <Link to="/forgot-password" className="text-[#1a2744] font-medium hover:underline">Forgot password</Link>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="mt-6 flex justify-end">
               <Button onClick={handleSubmit} disabled={!form.client_name || !form.client_email || loading}
                 className="bg-[#c9a84c] hover:bg-[#b8973b] text-[#1a2744] font-bold px-10">
-                {loading ? "Booking..." : "Confirm Booking"}
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  "Confirm Booking"
+                )}
               </Button>
             </div>
           </div>
